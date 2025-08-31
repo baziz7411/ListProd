@@ -15,7 +15,9 @@ const PRODUCTS = [
 
 function App() {
   return <div className='container fixed-top'>
-    <SearchBar/>
+        <SearchBar/>
+        <ProductTable products={PRODUCTS}/>
+
   </div>
 }
 
@@ -57,6 +59,55 @@ function Checkbox({checked, OnChecked, label, id}){
 
 
 
+
+
+
+
+
+
+
+function ProductTable({products}){
+
+    const rowsProduit = []
+    let lastCategory = null
+
+    for(let product of products){
+        if(product.category !== lastCategory){
+           rowsProduit.push(<ProductCategoryRow key={product.category} name={product.category}/>) 
+        }
+        lastCategory = product.category
+        rowsProduit.push(<ProductRow product={product} key={product.name} />)
+    }
+    return     <table className="table table-striped table-hover table-bordered shadow">
+
+      <thead className="table-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            {rowsProduit}
+        </tbody>
+    </table>
+
+}
+
+
+function ProductRow({product}){
+
+    const style = product.stocked ? undefined : {color : 'red'}
+    return <tr>
+        <td style={style}>{product.name}</td>
+        <td>{product.price}</td>
+    </tr>
+}
+
+function ProductCategoryRow({name}){
+    return <tr>
+        <td colSpan={2}><strong>{name}</strong></td>
+    </tr>
+}
 
 
 export default App
