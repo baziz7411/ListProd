@@ -18,11 +18,20 @@ function App() {
     const [search, setSearch] =  useState('')
     const [showStockedOnly, setShowStockedOnly] = useState(false)
 
+    const [maxPrice, setMaxPrice] = useState(10)
+
     const visibleProdusts = PRODUCTS.filter( product => { 
         if(showStockedOnly && !product.stocked){  // shoStokedOnly == true : la case est cocher , !product.stocked : le produit n'est pas en stock
             return false
         }
-        if(search && !product.name.includes(search)){
+       if(search && !product.name.toLowerCase().includes(search.toLowerCase())){
+            return false
+        }
+
+        const priceNum = typeof product.price === 'number' ? product.price : Number(String(product.price).replace(/[^0-9.]/g, '')); // transformer les prix de straing en num
+
+
+        if(priceNum > maxPrice){
             return false
         }
         return true
@@ -33,15 +42,15 @@ function App() {
             search = {search}
             OnSearchChange ={setSearch}
             showStockedOnly={showStockedOnly} 
-            onStockedOnlyChange={setShowStockedOnly} />
-
+            onStockedOnlyChange={setShowStockedOnly}           
+            maxPrice ={maxPrice}
+            onChangePrice ={setMaxPrice}
+            />
         <ProductTable products={visibleProdusts}/>
   </div>
 }
 
-
-
-function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange}){
+function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange, maxPrice, onChangePrice}){
     return <div className="mt-3">
         <div className='mb-3'>
             <Input 
@@ -55,10 +64,24 @@ function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange
             OnChecked={onStockedOnlyChange} 
             label="N'afficher que les produits en stock" id="stocked"/>
 
+            <InputRange value={maxPrice} onChange={onChangePrice} />
+
         </div>
     </div>
 }
 
+function InputRange({value, onChange}){
+    return <div className='mt-2'>
+            <input 
+                type='range' 
+                className='form-range' 
+                min={0}
+                max={10}
+                value={value}
+                onChange={(e) => onChange(Number(e.target.value))}/>
+                
+        </div>
+}
 
 function Input({placeholder, value, onChange}){
     return <div>
