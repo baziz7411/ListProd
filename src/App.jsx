@@ -15,26 +15,39 @@ const PRODUCTS = [
 
 function App() {
 
+    const [search, setSearch] =  useState('')
     const [showStockedOnly, setShowStockedOnly] = useState(false)
 
+    const visibleProdusts = PRODUCTS.filter( product => { 
+        if(showStockedOnly && !product.stocked){  // shoStokedOnly == true : la case est cocher , !product.stocked : le produit n'est pas en stock
+            return false
+        }
+        if(search && !product.name.includes(search)){
+            return false
+        }
+        return true
+    })
+
   return <div className='container fixed-top'>
-        <SearchBar
+        <SearchBar 
+            search = {search}
+            OnSearchChange ={setSearch}
             showStockedOnly={showStockedOnly} 
             onStockedOnlyChange={setShowStockedOnly} />
 
-        <ProductTable products={PRODUCTS}/>
+        <ProductTable products={visibleProdusts}/>
   </div>
 }
 
 
 
-function SearchBar({showStockedOnly , onStockedOnlyChange}){
+function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange}){
     return <div className="mt-3">
         <div className='mb-3'>
             <Input 
                 placeholder="Rechercher" 
-                value=""
-                onChange={() => null}
+                value={search}
+                onChange={OnSearchChange}
                 />
 
             <Checkbox 
