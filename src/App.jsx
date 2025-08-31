@@ -14,20 +14,34 @@ const PRODUCTS = [
 
 
 function App() {
-  return <div className='container fixed-top'>
-        <SearchBar/>
-        <ProductTable products={PRODUCTS}/>
 
+    const [showStockedOnly, setShowStockedOnly] = useState(false)
+
+  return <div className='container fixed-top'>
+        <SearchBar
+            showStockedOnly={showStockedOnly} 
+            onStockedOnlyChange={setShowStockedOnly} />
+
+        <ProductTable products={PRODUCTS}/>
   </div>
 }
 
 
 
-function SearchBar(){
+function SearchBar({showStockedOnly , onStockedOnlyChange}){
     return <div className="mt-3">
         <div className='mb-3'>
-            <Input placeholder="Rechercher" value="" onChange={() => null}/>
-            <Checkbox checked={false} OnChecked={() => null} label="N'afficher que les produits en stock" id="stocked"/>
+            <Input 
+                placeholder="Rechercher" 
+                value=""
+                onChange={() => null}
+                />
+
+            <Checkbox 
+            checked={showStockedOnly} 
+            OnChecked={onStockedOnlyChange} 
+            label="N'afficher que les produits en stock" id="stocked"/>
+
         </div>
     </div>
 }
@@ -51,7 +65,7 @@ function Checkbox({checked, OnChecked, label, id}){
             type='checkbox'
             className='form-check-input'
             checked={checked}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => OnChecked(e.target.checked)}
             />
             <label htmlFor={id} className='form-check-label'><strong>{label}</strong></label>
     </div>
