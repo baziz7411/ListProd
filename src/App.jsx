@@ -1,110 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { use } from 'react';
 
-
-const PRODUCTS = [  
-    {category: "Fruits", price: "$1", stocked: true, name: "Apple"},  
-    {category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit"},  
-    {category: "Fruits", price: "$2", stocked: false, name: "Passionfruit"},  
-    {category: "Vegetables", price: "$2", stocked: true, name: "Spinach"},  
-    {category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin"},  
-    {category: "Vegetables", price: "$1", stocked: true, name: "Peas"}  
-]
 
 
 function App() {
+  const [showInput, setSowInput] = useState(true);
 
-    const [search, setSearch] =  useState('')
-    const [showStockedOnly, setShowStockedOnly] = useState(false)
+  return <>
+    <div className='container my-3 stack'>
+      <input
+        type='checkbox'
+        checked={showInput}
+        onChange={(e) => setSowInput(e.target.checked)}
+        id="titelSow"
+      />
+      <label htmlFor="titelSow">Afficher le champ titre</label>
 
-    const [maxPrice, setMaxPrice] = useState(10)
-
-    const visibleProdusts = PRODUCTS.filter( product => { 
-        if(showStockedOnly && !product.stocked){  // shoStokedOnly == true : la case est cocher , !product.stocked : le produit n'est pas en stock
-            return false
-        }
-       if(search && !product.name.toLowerCase().includes(search.toLowerCase())){
-            return false
-        }
-
-        const priceNum = typeof product.price === 'number' ? product.price : Number(String(product.price).replace(/[^0-9.]/g, '')); // transformer les prix de straing en num
+      {showInput && <EditTitle/>}
+      <div style={{ height: '300vh' }} />
 
 
-        if(priceNum > maxPrice){
-            return false
-        }
-        return true
-    })
-
-  return <div className='container fixed-top'>
-        <SearchBar 
-            search = {search}
-            OnSearchChange ={setSearch}
-            showStockedOnly={showStockedOnly} 
-            onStockedOnlyChange={setShowStockedOnly}           
-            maxPrice ={maxPrice}
-            onChangePrice ={setMaxPrice}
-            />
-        <ProductTable products={visibleProdusts}/>
-  </div>
-}
-
-function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange, maxPrice, onChangePrice}){
-    return <div className="mt-3">
-        <div className='mb-3'>
-            <Input 
-                placeholder="Rechercher" 
-                value={search}
-                onChange={OnSearchChange}
-                />
-
-            <Checkbox 
-            checked={showStockedOnly} 
-            OnChecked={onStockedOnlyChange} 
-            label="N'afficher que les produits en stock" id="stocked"/>
-
-            <InputRange value={maxPrice} onChange={onChangePrice} />
-
-        </div>
+          
     </div>
-}
-
-function InputRange({value, onChange}){
-    return <div className='mt-2'>
-            <input 
-                type='range' 
-                className='form-range' 
-                min={0}
-                max={10}
-                value={value}
-                onChange={(e) => onChange(Number(e.target.value))}/>
-                
-        </div>
-}
-
-function Input({placeholder, value, onChange}){
-    return <div>
-        <input
-        type='text'
-        className='form-control'
-        value={value}
-        placeholder={placeholder}
-        onChange={ (e)=> onChange(e.target.value)}
-        />      
-    </div>
-}
-function Checkbox({checked, OnChecked, label, id}){
-    return <div className='form-check'>
-        <input
-            id={id}
-            type='checkbox'
-            className='form-check-input'
-            checked={checked}
-            onChange={(e) => OnChecked(e.target.checked)}
-            />
-            <label htmlFor={id} className='form-check-label'><strong>{label}</strong></label>
-    </div>
+    </>
 }
 
 
@@ -112,51 +33,76 @@ function Checkbox({checked, OnChecked, label, id}){
 
 
 
+function EditTitle() {
+  const [titre, setTitre] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [y, setY] = useState(0);
 
-
-
-
-function ProductTable({products}){
-
-    const rowsProduit = []
-    let lastCategory = null
-
-    for(let product of products){
-        if(product.category !== lastCategory){
-           rowsProduit.push(<ProductCategoryRow key={product.category} name={product.category}/>) 
+   useEffect(()=>{
+        const originalTitle = document.title
+        return () => {
+            document.title = originalTitle
         }
-        lastCategory = product.category
-        rowsProduit.push(<ProductRow product={product} key={product.name} />)
+    },[])
+  useEffect(()=>{
+    document.title = titre
+  },[titre]);
+
+  
+  // ecouter le scroll
+
+
+  useEffect(()=>{
+    const handler = (e) => {
+        console.log('scroll')
+        setY(window.scrollY)
     }
-    return     <table className="table table-striped table-hover table-bordered shadow">
 
-      <thead className="table-dark">
-            <tr>
-                <th>Nom</th>
-                <th>Prix</th>
-            </tr>
-        </thead>
-        <tbody>
-            {rowsProduit}
-        </tbody>
-    </table>
+    window.addEventListener('scroll', handler);
 
+    return ()=>{window.removeEventListener('scroll', handler)} // pour que quand on affiche pas le composant le lisner scroll ne fonctionne pas 
+  },[])
+
+
+
+  return <>
+    <div className='vstack gap-2'>
+        <div> Scroll : {y}</div>
+      <input
+        className='form-control mb-2'
+        placeholder='Modifier le titre'
+        value={titre}
+        onChange={(e) => setTitre(e.target.value)}
+      />
+
+      <input
+        className='form-control mb-2'
+        placeholder='Prénom'
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+      />
+    </div>
+  </>
 }
 
 
-function ProductRow({product}){
+function Exercice() {
+  const [duration, setDuration] = useState(5);
+  const [secondLeft, setSecondLeft] = useState(duration);
 
-    const style = product.stocked ? undefined : {color : 'red'}
-    return <tr>
-        <td style={style}>{product.name}</td>
-        <td>{product.price}</td>
-    </tr>
-}
+  return (
+    <div className="vstack gap-2">
+      <input
+        type="number"
+        value={duration}
+        onChange={(e) => setDuration(Number(e.target.value))}
+        placeholder="Timer..."
+        className="form-control"
+      />
 
-function ProductCategoryRow({name}){
-    return <tr>
-        <td colSpan={2}><strong>{name}</strong></td>
-    </tr>
+      <p>Décompte : {secondLeft} secondes</p>
+    </div>
+  );
 }
 
 
