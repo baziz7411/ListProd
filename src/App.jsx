@@ -1,25 +1,29 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import { useToggle } from './components /useToggle'
-import { useIncrement } from './components /useIncremente'
-import { useDocumentTitle } from './components /useDocumentTitle'
+import { useFetch } from './hooks/useFetch'
 
 
 function App() {
-  const {count, decrement, increment} = useIncrement(0);
 
-  const [name, setName] = useState('')
-  useDocumentTitle(name? 'Editer' + name : null)
+  const {loading, data, errors} = useFetch('https://jsonplaceholder.typicode.com/posts?_limit=10&_delay=5000')
 
-  return <div>ef
+  return <div className='container my-2 fixed-top'>
 
-<input value={name} onChange={(e) => setName(e.target.value)} label="Nom : "></input>
+            {loading && <div className='spinner-border' role="status"> 
 
-    Compteur {count}
-    <button onClick={decrement}>Décrement</button>
-        <button onClick={increment}>Inrément</button>
+                            <span className='visually-hidden'> Loading...</span>
 
+                        </div>}
+            
+            {errors && <div className='alert alert-danger'>{errors.toString()}</div>}
+            {data && <div>
+                        <ul>
+                            {data.map(article => (<li key={article.id}> {article.title} </li>))}
+                        </ul>
+
+                     </div>}
+  
   </div>
 }
   
