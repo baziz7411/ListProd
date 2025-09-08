@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import React from 'react'
 
 
 const PRODUCTS = [  
@@ -46,7 +48,13 @@ function App() {
             maxPrice ={maxPrice}
             onChangePrice ={setMaxPrice}
             />
+
+
+
+    <ErrorBoundary fallback={<p>Impossible de télécharger le liste des produits</p>}>        
         <ProductTable products={visibleProdusts}/>
+
+    </ErrorBoundary>
   </div>
 }
 
@@ -147,6 +155,8 @@ function ProductTable({products}){
 function ProductRow({product}){
 
     const style = product.stocked ? undefined : {color : 'red'}
+
+    throw new Error('Test Error Boundary')
     return <tr>
         <td style={style}>{product.name}</td>
         <td>{product.price}</td>
