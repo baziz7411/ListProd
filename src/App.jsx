@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import { ErrorBoundary } from './components/ErrorBoundary'
+import { ErrorBoundary } from "react-error-boundary";
 import React from 'react'
 
 
@@ -51,12 +51,20 @@ function App() {
 
 
 
-    <ErrorBoundary fallback={<p>Impossible de télécharger le liste des produits</p>}>        
+    <ErrorBoundary fallback={<p>Impossible de télécharger le liste des produits</p>}
+                    onReset={()=>console.log('reset')}
+                    >        
         <ProductTable products={visibleProdusts}/>
 
     </ErrorBoundary>
   </div>
 }
+
+function AlertError(){
+    
+}
+
+
 
 function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange, maxPrice, onChangePrice}){
     return <div className="mt-3">
