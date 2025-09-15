@@ -1,181 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import { ErrorBoundary } from "react-error-boundary";
-import React from 'react'
-
-
-const PRODUCTS = [  
-    {category: "Fruits", price: "$1", stocked: true, name: "Apple"},  
-    {category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit"},  
-    {category: "Fruits", price: "$2", stocked: false, name: "Passionfruit"},  
-    {category: "Vegetables", price: "$2", stocked: true, name: "Spinach"},  
-    {category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin"},  
-    {category: "Vegetables", price: "$1", stocked: true, name: "Peas"}  
-]
-
+import React, { lazy, Suspense } from "react";
+import { useHashNavigation } from "./components/UseHashNavigation";
+import Contact from "./pages/Contact";
+import Home from "./pages/Home";
+import Header from "./pages/Header";
 
 function App() {
+  const [page, navigate] = useHashNavigation("home");
 
-    const [search, setSearch] =  useState('')
-    const [showStockedOnly, setShowStockedOnly] = useState(false)
+  const pageContent = getPageContent(page);
 
-    const [maxPrice, setMaxPrice] = useState(10)
-
-    const visibleProdusts = PRODUCTS.filter( product => { 
-        if(showStockedOnly && !product.stocked){  // shoStokedOnly == true : la case est cocher , !product.stocked : le produit n'est pas en stock
-            return false
-        }
-       if(search && !product.name.toLowerCase().includes(search.toLowerCase())){
-            return false
-        }
-
-        const priceNum = typeof product.price === 'number' ? product.price : Number(String(product.price).replace(/[^0-9.]/g, '')); // transformer les prix de straing en num
-
-
-        if(priceNum > maxPrice){
-            return false
-        }
-        return true
-    })
-
-  return <div className='container fixed-top'>
-        <SearchBar 
-            search = {search}
-            OnSearchChange ={setSearch}
-            showStockedOnly={showStockedOnly} 
-            onStockedOnlyChange={setShowStockedOnly}           
-            maxPrice ={maxPrice}
-            onChangePrice ={setMaxPrice}
-            />
-
-
-
-    <ErrorBoundary fallback={<p>Impossible de télécharger le liste des produits</p>}
-                    onReset={()=>console.log('reset')}
-                    >        
-        <ProductTable products={visibleProdusts}/>
-
-    </ErrorBoundary>
-  </div>
-}
-
-function AlertError(){
-    
-}
-
-
-
-function SearchBar({search,OnSearchChange, showStockedOnly , onStockedOnlyChange, maxPrice, onChangePrice}){
-    return <div className="mt-3">
-        <div className='mb-3'>
-            <Input 
-                placeholder="Rechercher" 
-                value={search}
-                onChange={OnSearchChange}
-                />
-
-            <Checkbox 
-            checked={showStockedOnly} 
-            OnChecked={onStockedOnlyChange} 
-            label="N'afficher que les produits en stock" id="stocked"/>
-
-            <InputRange value={maxPrice} onChange={onChangePrice} />
-
-        </div>
+  return (
+    <div className="container y-2 fixed-top">
+      <Header  currentPage={page} navigate={navigate} />
+      <div>{pageContent}</div>
     </div>
+  );
 }
 
-function InputRange({value, onChange}){
-    return <div className='mt-2'>
-            <input 
-                type='range' 
-                className='form-range' 
-                min={0}
-                max={10}
-                value={value}
-                onChange={(e) => onChange(Number(e.target.value))}/>
-                
-        </div>
+function getPageContent(page) {
+  if (page === "home") {
+    return <Home />;
+  }
+  if (page === "single") {
+
+        const SingleLazy = lazy(()=> import('./pages/Single'))
+
+    return <Suspense fallback={<div>Chargement des composants en cour </div>}>  // chargement de manière asynchrone 
+            <SingleLazy />
+        
+        </Suspense>
+  }
+  if (page === "contact") {
+    return <Contact />;
+  }
+  return <h2>404 - Page "{page}" not found</h2>;
 }
 
-function Input({placeholder, value, onChange}){
-    return <div>
-        <input
-        type='text'
-        className='form-control'
-        value={value}
-        placeholder={placeholder}
-        onChange={ (e)=> onChange(e.target.value)}
-        />      
-    </div>
-}
-function Checkbox({checked, OnChecked, label, id}){
-    return <div className='form-check'>
-        <input
-            id={id}
-            type='checkbox'
-            className='form-check-input'
-            checked={checked}
-            onChange={(e) => OnChecked(e.target.checked)}
-            />
-            <label htmlFor={id} className='form-check-label'><strong>{label}</strong></label>
-    </div>
-}
-
-
-
-
-
-
-
-
-
-
-function ProductTable({products}){
-
-    const rowsProduit = []
-    let lastCategory = null
-
-    for(let product of products){
-        if(product.category !== lastCategory){
-           rowsProduit.push(<ProductCategoryRow key={product.category} name={product.category}/>) 
-        }
-        lastCategory = product.category
-        rowsProduit.push(<ProductRow product={product} key={product.name} />)
-    }
-    return     <table className="table table-striped table-hover table-bordered shadow">
-
-      <thead className="table-dark">
-            <tr>
-                <th>Nom</th>
-                <th>Prix</th>
-            </tr>
-        </thead>
-        <tbody>
-            {rowsProduit}
-        </tbody>
-    </table>
-
-}
-
-
-function ProductRow({product}){
-
-    const style = product.stocked ? undefined : {color : 'red'}
-
-    throw new Error('Test Error Boundary')
-    return <tr>
-        <td style={style}>{product.name}</td>
-        <td>{product.price}</td>
-    </tr>
-}
-
-function ProductCategoryRow({name}){
-    return <tr>
-        <td colSpan={2}><strong>{name}</strong></td>
-    </tr>
-}
-
-
-export default App
+export default App;
