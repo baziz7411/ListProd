@@ -25,7 +25,7 @@ function getPageContent(page) {
 
         const SingleLazy = lazy(()=> import('./pages/Single'))
 
-    return <Suspense fallback={<div>Chargement des composants en cour </div>}>  // chargement de manière asynchrone 
+    return <Suspense fallback={<div>Chargement des composants en cour </div>}>  /* chargement de manière asynchrone */
             <SingleLazy />
         
         </Suspense>
