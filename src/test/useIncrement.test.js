@@ -27,7 +27,7 @@ describe('useIncrement', ()=>{
         act(()=> result.current.setIncrement())
         act(()=> result.current.setIncrement())
         act(()=> result.current.setIncrement())
-        expect(result.current.count).toBe(7)
+        expect(result.current.count).toBe(7) // j'increment pluseur fois et j'attend que la valleur max reste a 7
 
 
 
