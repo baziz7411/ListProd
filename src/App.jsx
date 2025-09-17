@@ -164,7 +164,7 @@ function ProductRow({product}){
 
     const style = product.stocked ? undefined : {color : 'red'}
 
-    throw new Error('Test Error Boundary')
+   // throw new Error('Test Error Boundary')
     return <tr>
         <td style={style}>{product.name}</td>
         <td>{product.price}</td>
